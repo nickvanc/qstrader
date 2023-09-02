@@ -2,6 +2,7 @@ import datetime
 
 import pandas as pd
 from pandas.tseries.offsets import BDay
+from pandas.tseries.holiday import USFederalHolidayCalendar
 import pytz
 
 from qstrader.simulation.sim_engine import SimulationEngine
@@ -58,9 +59,13 @@ class DailyBusinessDaySimulationEngine(SimulationEngine):
         `list[pd.Timestamp]`
             The business day range list.
         """
+        cal = USFederalHolidayCalendar()
+        non_trading_days = pd.to_datetime(cal.holidays(self.starting_day, self.ending_day))
+
         days = pd.date_range(
             self.starting_day, self.ending_day, freq=BDay()
         )
+        days = days[~days.isin(non_trading_days)]
         return days
 
     def __iter__(self):
