@@ -362,7 +362,8 @@ class BacktestTradingSession(TradingSession):
         alloc_df.index = alloc_df.index.date
         alloc_df = alloc_df.reindex(index=equity_curve.index, method='ffill')
         if self.burn_in_dt is not None:
-            alloc_df = alloc_df[self.burn_in_dt:]
+            date_stamp = self.burn_in_dt.date()
+            alloc_df = alloc_df[date_stamp:]
         return alloc_df
 
     def run(self, results=False):

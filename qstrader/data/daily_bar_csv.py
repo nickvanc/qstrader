@@ -197,6 +197,19 @@ class CSVDailyBarDataSource(object):
                 self._convert_bar_frame_into_bid_ask_df(bar_df)
         return asset_bid_ask_frames
 
+    def _get_index(self, df, dt):
+        """
+        Obtain the index of the dataframe.
+
+        If DateTime object is not found, take the next newest DateTimeObject.
+        """
+        try:
+            index = df.index.get_loc(dt)
+        except KeyError:
+            next_dt = df.index[df.index > dt].min()
+            index = df.index.get_loc(next_dt)
+        return index
+
     @functools.lru_cache(maxsize=1024 * 1024)
     def get_bid(self, dt, asset):
         """
@@ -216,8 +229,9 @@ class CSVDailyBarDataSource(object):
         """
         bid_ask_df = self.asset_bid_ask_frames[asset]
         try:
-            bid = bid_ask_df.iloc[bid_ask_df.index.get_loc(dt)]['Bid']
-        except KeyError:  # Before start date
+            index = self._get_index(bid_ask_df, dt)
+            bid = bid_ask_df.iloc[index]['Bid']
+        except KeyError:
             return np.NaN
         return bid
 
@@ -240,7 +254,8 @@ class CSVDailyBarDataSource(object):
         """
         bid_ask_df = self.asset_bid_ask_frames[asset]
         try:
-            ask = bid_ask_df.iloc[bid_ask_df.index.get_loc(dt)]['Ask']
+            index = self._get_index(bid_ask_df, dt)
+            ask = bid_ask_df.iloc[index]['Ask']
         except KeyError:  # Before start date
             return np.NaN
         return ask

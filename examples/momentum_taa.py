@@ -14,13 +14,14 @@ from qstrader.signals.signals_collection import SignalsCollection
 from qstrader.data.backtest_data_handler import BacktestDataHandler
 from qstrader.data.daily_bar_csv import CSVDailyBarDataSource
 from qstrader.statistics.tearsheet import TearsheetStatistics
+from qstrader.statistics.json_statistics import JSONStatistics
 from qstrader.trading.backtest import BacktestTradingSession
 
 
 class TopNMomentumAlphaModel(AlphaModel):
 
     def __init__(
-        self, signals, mom_lookback, mom_top_n, universe, data_handler
+            self, signals, mom_lookback, mom_top_n, universe, data_handler
     ):
         """
         Initialise the TopNMomentumAlphaModel
@@ -52,7 +53,7 @@ class TopNMomentumAlphaModel(AlphaModel):
         self.data_handler = data_handler
 
     def _highest_momentum_asset(
-        self, dt
+            self, dt
     ):
         """
         Calculates the ordered list of highest performing momentum
@@ -71,7 +72,7 @@ class TopNMomentumAlphaModel(AlphaModel):
             restricted to the 'Top N'.
         """
         assets = self.signals['momentum'].assets
-        
+
         # Calculate the holding-period return momenta for each asset,
         # for the particular provided momentum lookback period
         all_momenta = {
@@ -84,15 +85,15 @@ class TopNMomentumAlphaModel(AlphaModel):
         # restricted by the provided number of desired assets to
         # trade per month
         return [
-            asset[0] for asset in sorted(
+                   asset[0] for asset in sorted(
                 all_momenta.items(),
                 key=operator.itemgetter(1),
                 reverse=True
             )
-        ][:self.mom_top_n]
+               ][:self.mom_top_n]
 
     def _generate_signals(
-        self, dt, weights
+            self, dt, weights
     ):
         """
         Calculate the highest performing momentum for each
@@ -118,7 +119,7 @@ class TopNMomentumAlphaModel(AlphaModel):
         return weights
 
     def __call__(
-        self, dt
+            self, dt
     ):
         """
         Calculates the signal weights for the top N
@@ -149,9 +150,9 @@ class TopNMomentumAlphaModel(AlphaModel):
 
 if __name__ == "__main__":
     # Duration of the backtest
-    start_dt = pd.Timestamp('1998-12-22 14:30:00', tz=pytz.UTC)
-    burn_in_dt = pd.Timestamp('1999-12-22 14:30:00', tz=pytz.UTC)
-    end_dt = pd.Timestamp('2020-12-31 23:59:00', tz=pytz.UTC)
+    start_dt = pd.Timestamp('2018-09-04 14:30:00', tz=pytz.UTC)
+    burn_in_dt = pd.Timestamp('2019-09-04 14:30:00', tz=pytz.UTC)
+    end_dt = pd.Timestamp('2023-09-01 23:59:00', tz=pytz.UTC)
 
     # Model parameters
     mom_lookback = 126  # Six months worth of business days
@@ -229,3 +230,13 @@ if __name__ == "__main__":
         title='US Sector Momentum - Top 3 Sectors'
     )
     tearsheet.plot_results()
+    json_stats = JSONStatistics(
+        equity_curve=strategy_backtest.get_equity_curve(),
+        target_allocations=strategy_backtest.get_target_allocations(),
+        # strategy_id=None,
+        # strategy_name=None,
+        # benchmark_curve=None,
+        # benchmark_id=None,
+        # benchmark_name=None,
+    )
+    json_stats.to_file()

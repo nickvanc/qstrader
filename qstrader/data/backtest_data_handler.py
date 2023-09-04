@@ -6,9 +6,9 @@ class BacktestDataHandler(object):
     """
 
     def __init__(
-        self,
-        universe,
-        data_sources=None
+            self,
+            universe,
+            data_sources=None
     ):
         self.universe = universe
         self.data_sources = data_sources
@@ -19,12 +19,11 @@ class BacktestDataHandler(object):
         # TODO: Check for asset in Universe
         bid = np.NaN
         for ds in self.data_sources:
-            try:
-                bid = ds.get_bid(dt, asset_symbol)
-                if not np.isnan(bid):
-                    return bid
-            except Exception:
-                bid = np.NaN
+            bid = ds.get_bid(dt, asset_symbol)
+            if not np.isnan(bid):
+                return bid
+            else:
+                raise ValueError(f"Couldn't retrieve latest bid price for asset '{asset_symbol}' at '{dt}'")
         return bid
 
     def get_asset_latest_ask_price(self, dt, asset_symbol):
@@ -33,12 +32,11 @@ class BacktestDataHandler(object):
         # TODO: Check for asset in Universe
         ask = np.NaN
         for ds in self.data_sources:
-            try:
-                ask = ds.get_ask(dt, asset_symbol)
-                if not np.isnan(ask):
-                    return ask
-            except Exception:
-                ask = np.NaN
+            ask = ds.get_ask(dt, asset_symbol)
+            if not np.isnan(ask):
+                return ask
+            else:
+                raise ValueError(f"Couldn't retrieve latest ask price for asset '{asset_symbol}' at '{dt}'")
         return ask
 
     def get_asset_latest_bid_ask_price(self, dt, asset_symbol):
@@ -65,7 +63,7 @@ class BacktestDataHandler(object):
         return mid
 
     def get_assets_historical_range_close_price(
-        self, start_dt, end_dt, asset_symbols, adjusted=False
+            self, start_dt, end_dt, asset_symbols, adjusted=False
     ):
         """
         """

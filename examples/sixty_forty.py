@@ -13,8 +13,8 @@ from qstrader.trading.backtest import BacktestTradingSession
 
 
 if __name__ == "__main__":
-    start_dt = pd.Timestamp('2003-09-30 14:30:00', tz=pytz.UTC)
-    end_dt = pd.Timestamp('2019-12-31 23:59:00', tz=pytz.UTC)
+    start_dt = pd.Timestamp('2018-09-04 00:00:00', tz=pytz.UTC)
+    end_dt = pd.Timestamp('2023-09-01 23:59:00', tz=pytz.UTC)
 
     # Construct the symbols and assets necessary for the backtest
     strategy_symbols = ['SPY', 'AGG']
